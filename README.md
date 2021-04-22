@@ -14,3 +14,5 @@ from frstl import fast_robustSTL
 input_ori, trends_hat, multiple_seas, remainders_hat =\
     fast_robustSTL(input, season_lens, trend_regs, season_regs, alphas, z, denoise_ds, season_ds, K, H)
 ```
+
+For a pre-run colab notebook plese click [this link](https://colab.research.google.com/drive/17Mddx2PuqpkyPLDQmbQMGYm-zc9fGFR-?usp=sharing).
