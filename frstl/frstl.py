@@ -44,10 +44,6 @@ def seasonality_extraction(sample, season_lens, alphas, z, K=2, H=5, ds1=50., ds
     return seasons_tilda
 
 
-def gadmm(P, q):
-    return None
-
-
 def circulantify(A, diff):
     extra = A[-1]
     rows = []
@@ -63,7 +59,6 @@ def trend_extraction(sample, season_len, reg1=10., reg2=0.5):
     season_diff = sample[season_len:] - sample[:-season_len]
     g = season_diff[:, None]
 
-    # might not need q
     assert len(season_diff) == (sample_len - season_len)
     q = np.concatenate([season_diff, np.zeros([sample_len*2-3])])
     q = np.reshape(q, [len(q), 1])
@@ -73,13 +68,8 @@ def trend_extraction(sample, season_len, reg1=10., reg2=0.5):
     D = get_toeplitz([sample_len-2, sample_len-1], np.array([1, -1]))
     P = np.concatenate([M, reg1*np.eye(sample_len-1), reg2*D], axis=0)
 
-    # '''
-    # ADAM
-    # '''
-    # delta_trends = solve_trend_extraction(M, D, g, reg1, reg2)
-
     '''
-    l1
+    l1 approximation solver
     '''
     q = matrix(q)
     P = matrix(P)
@@ -176,7 +166,6 @@ def quick_viz(plots, labels):
 
 def fast_robustSTL(input, season_lens, trend_regs, season_regs, alphas, z, denoise_ds, season_ds, K=2, H=5):
     sample = input
-
     trial = 1
     while True:
         '''
@@ -229,7 +218,7 @@ def fast_robustSTL(input, season_lens, trend_regs, season_regs, alphas, z, denoi
 
 
 if __name__ == '__main__':
-    import matplotlib.pyplot as plt 
+    import matplotlib.pyplot as plt
 
     N = 1500
     y1 = sinewave(N, 24, 1)
@@ -247,10 +236,7 @@ if __name__ == '__main__':
     season_regs = [[0.001, 1, 10],    # reg 1, 2, 3 for seasonality  1
                    [0.0001, 100, 1],   # reg 1, 2, 3 for seasonality  2
                    [500, 0.01, 10]]  # reg 1, 2, 3 for seasonality  3
-    # season_regs = [[0.01, 1, 10],
-    #                [10, 1, 0.01],
-    #                [100, 1, 0.0001]]
-    # weighting factor for each non-local seasonal filter (Eq. 10) -> len = m
+
     alphas = [0.01, 0.01, 1]
     # normalization factor (Eq. 10)
     z = 3
@@ -274,7 +260,7 @@ if __name__ == '__main__':
 
     input_ori, trends_hat, multiple_seas, remainders_hat = result
 
-    # quick_viz([input_ori, trends_hat], ['input', 'trend'])
-    # quick_viz([y1, y2, y3], ['sinewave 1', 'sinewave 2', 'sinewave 3'])
+    quick_viz([input_ori, trends_hat], ['input', 'trend'])
+    quick_viz([y1, y2, y3], ['sinewave 1', 'sinewave 2', 'sinewave 3'])
     quick_viz([*multiple_seas.T, remainders_hat],
               [f'seasonality {i+1}' for i in range(multiple_seas.shape[1])] + ['remainders'])
