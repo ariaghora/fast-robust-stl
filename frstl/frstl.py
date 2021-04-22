@@ -1,8 +1,7 @@
 import numpy as np
 import torch
-from utils import *
-
-from l1 import l1
+from .utils import *
+from .l1 import l1
 from cvxopt import matrix
 
 
