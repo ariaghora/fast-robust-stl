@@ -106,25 +106,27 @@ def decompose_multiple_seasonal_components(seasons_hat, season_lens, season_regs
     m = len(season_lens)
     N = len(seasons_hat)
 
-    seasons_predict = torch.empty(N, m).double()
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    seasons_predict = torch.empty(N, m).double().to(device)
     seasons_predict.requires_grad = True
     torch.nn.init.xavier_uniform_(seasons_predict)
 
-    seasons_hat = torch.from_numpy(seasons_hat)
+    seasons_hat = torch.from_numpy(seasons_hat).to(device)
 
     D = get_toeplitz([N-2, N-1], np.array([1, -1]))
-    D = torch.from_numpy(D).double()
+    D = torch.from_numpy(D).double().to(device)
 
     D2 = get_toeplitz([N-2, N], np.array([1, -2, 1]))
-    D2 = torch.from_numpy(D2).double()
+    D2 = torch.from_numpy(D2).double().to(device)
 
     DTis = [get_toeplitz([N-2*slen, N], np.array(
         [1, *([0]*(slen-1)), -2, *([0]*(slen-1)), 1])) for slen in season_lens]
-    DTis = [torch.from_numpy(DTi).double() for DTi in DTis]
+    DTis = [torch.from_numpy(DTi).double().to(device) for DTi in DTis]
 
-    season_regs = torch.from_numpy(np.array(season_regs)).double()
+    season_regs = torch.from_numpy(np.array(season_regs)).double().to(device)
 
-    sse = torch.nn.MSELoss(reduction='sum')  # **SUM** squared error
+    sse = torch.nn.MSELoss(reduction='sum').to(device)  # **SUM** squared error
     opt = torch.optim.Adam([seasons_predict], lr=0.001)
     for j in range(max_iter):
         opt.zero_grad()
