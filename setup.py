@@ -1,14 +1,14 @@
 from setuptools import setup
 
 setup(
-    name='fast-robust-stl',
+    name='frstl',
     version='0.1.0',
     description=('Unofficial implementation of "Fast RobustSTL: Efficient and Robust Seasonal-Trend Decomposition for Time Series with Complex Patterns"'),
     author='Aria Ghora Prabono',
     author_email='hello@ghora.net',
     url='https://github.com/ariaghora/torch_kernel',
     license='MIT',
-    packages=['fast-robust-stl'],
+    packages=['frstl'],
     include_package_data=True,
     classifiers=[
         'Intended Audience :: Science/Research',
