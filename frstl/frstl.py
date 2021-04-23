@@ -3,6 +3,7 @@ import torch
 from .utils import *
 from .l1 import l1
 from cvxopt import matrix
+from tqdm import tqdm
 
 
 def denoise_step(sample, H=3, dn1=1., dn2=1.):
@@ -44,16 +45,6 @@ def seasonality_extraction(sample, season_lens, alphas, z, K=2, H=5, ds1=50., ds
     return seasons_tilda
 
 
-def circulantify(A, diff):
-    extra = A[-1]
-    rows = []
-    for i in range(diff):
-        rows.append(np.roll(extra[:], i+1))
-
-    A_hat = np.vstack(rows)
-    return np.vstack([A, A_hat])
-
-
 def trend_extraction(sample, season_len, reg1=10., reg2=0.5):
     sample_len = len(sample)
     season_diff = sample[season_len:] - sample[:-season_len]
@@ -84,9 +75,6 @@ def adjustment(sample, relative_trends, seasons_tilda, season_len):
     num_season = int(len(sample)/season_len)
 
     trend_init = np.mean(seasons_tilda[:season_len*num_season])
-    # trend_init = seasons_tilda.mean()
-
-    print(f'len: {len(seasons_tilda)}')
 
     trends_hat = relative_trends + trend_init
     seasons_hat = seasons_tilda - trend_init
@@ -128,7 +116,10 @@ def decompose_multiple_seasonal_components(seasons_hat, season_lens, season_regs
 
     sse = torch.nn.MSELoss(reduction='sum').to(device)  # **SUM** squared error
     opt = torch.optim.Adam([seasons_predict], lr=0.001)
-    for j in range(max_iter):
+
+    print('Extracting multiple seasonalities...')
+    pbar = tqdm(range(max_iter))
+    for j in pbar:
         opt.zero_grad()
 
         # following terms are those in Eq. 17
@@ -147,8 +138,10 @@ def decompose_multiple_seasonal_components(seasons_hat, season_lens, season_regs
         loss.backward()
         opt.step()
 
-        if j % 1000 == 0:
-            print(f'loss at {j}/{max_iter-1}: {loss.item()}')
+        pbar.set_description(f'Loss: {loss.item()}')
+
+        # if j % 1000 == 0:
+        #     print(f'loss at {j}/{max_iter-1}: {loss.item()}')
 
     res = seasons_predict.detach().cpu().numpy()
 
@@ -233,7 +226,7 @@ if __name__ == '__main__':
     # season lengths -> len = m
     season_lens = [24, 168, 672]
     # trend extraction regularization factors -> len = 2
-    trend_regs = [10.0, 10.0]
+    trend_regs = [1.0, 10.0]
     # season regularization factors -> len = 3 * m
     season_regs = [[0.001, 1, 10],    # reg 1, 2, 3 for seasonality  1
                    [0.0001, 100, 1],   # reg 1, 2, 3 for seasonality  2
