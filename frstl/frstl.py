@@ -3,7 +3,7 @@ import torch
 from .utils import *
 from .l1 import l1
 from cvxopt import matrix
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 
 def denoise_step(sample, H=3, dn1=1., dn2=1.):
