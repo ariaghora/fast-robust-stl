@@ -102,7 +102,7 @@ def check_converge_criteria(prev_remainders, remainders):
         return False
 
 
-def decompose_multiple_seasonal_components(seasons_hat, season_lens, season_regs, max_iter=5000):
+def decompose_multiple_seasonal_components(seasons_hat, season_lens, season_regs, max_iter):
     m = len(season_lens)
     N = len(seasons_hat)
 
@@ -166,7 +166,7 @@ def quick_viz(plots, labels):
     plt.show()
 
 
-def fast_robustSTL(input, season_lens, trend_regs, season_regs, alphas, z, denoise_ds, season_ds, K=2, H=5):
+def fast_robustSTL(input, season_lens, trend_regs, season_regs, alphas, z, denoise_ds, season_ds, K=2, H=5, max_iter=5000):
     sample = input
     trial = 1
     while True:
@@ -214,7 +214,7 @@ def fast_robustSTL(input, season_lens, trend_regs, season_regs, alphas, z, denoi
 
     multiple_seas =\
         decompose_multiple_seasonal_components(
-            seasons_hat, season_lens, season_regs)
+            seasons_hat, season_lens, season_regs, max_iter)
 
     return [input, trends_hat, multiple_seas, remainders_hat]
 
