@@ -3,3 +3,4 @@ report*
 *.pdf
 .DS_Store
 __pycache__
+*.pkl

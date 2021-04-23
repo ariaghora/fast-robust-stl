@@ -150,7 +150,7 @@ def decompose_multiple_seasonal_components(seasons_hat, season_lens, season_regs
         if j % 1000 == 0:
             print(f'loss at {j}/{max_iter-1}: {loss.item()}')
 
-    res = seasons_predict.detach().numpy()
+    res = seasons_predict.detach().cpu().numpy()
 
     return res
 
