@@ -1,4 +1,7 @@
 .ipynb_checkpoints
+dataset
+RobustSTL
+*.ipynb
 report*
 *.pdf
 .DS_Store

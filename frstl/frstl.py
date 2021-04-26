@@ -205,9 +205,12 @@ def fast_robustSTL(input, season_lens, trend_regs, season_regs, alphas, z, denoi
     Need suggestion.
     '''
 
-    multiple_seas =\
-        decompose_multiple_seasonal_components(
-            seasons_hat, season_lens, season_regs, max_iter)
+    if len(season_lens) == 1:
+        multiple_seas = seasons_hat
+    else:
+        multiple_seas =\
+            decompose_multiple_seasonal_components(
+                seasons_hat, season_lens, season_regs, max_iter)
 
     return [input, trends_hat, multiple_seas, remainders_hat]
 
